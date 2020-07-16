@@ -1,0 +1,30 @@
+---
+# Setup LAMP Stack
+- hosts: web
+  become: yes
+  tasks:
+    - name: install lamp stack
+      apt:
+        pkg:
+          - apache2
+          - mysql-server
+          - php
+          - php-mysql
+        state: present
+        update_cache: yes
+    - name: start apache service
+      service:
+        name: apache2
+        state: started
+        enabled: yes
+    - name: create target directory
+      file: path=/var/www/html state=directory owner=www-data group=root mode=0755 
+    - name: Unarchive a file that needs to be downloaded (added in 2.0)
+      unarchive:
+        src:  /root/terraform/elb-app-deploymnet/data/app.tar.gz
+        dest: /var/www/html
+        remote_src: no
+    - name: Clean index.html file
+      file:
+        state: absent
+        path: /var/www/html/index.html
